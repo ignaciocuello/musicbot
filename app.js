@@ -27,6 +27,7 @@ app.use(bodyParser.urlencoded({
 }));
 
 app.get('/', function(req, res) {
+  console.log('root')
   if (spotifyApi.getAccessToken()) {
     return res.send('You are logged in.');
   }
@@ -34,6 +35,7 @@ app.get('/', function(req, res) {
 });
 
 app.get('/authorise', function(req, res) {
+  console.log('authorise')
   var scopes = ['playlist-modify-public', 'playlist-modify-private'];
   var state  = new Date().getTime();
   var authoriseURL = spotifyApi.createAuthorizeURL(scopes, state);
@@ -41,6 +43,7 @@ app.get('/authorise', function(req, res) {
 });
 
 app.get('/callback', function(req, res) {
+  console.log('callback')
   spotifyApi.authorizationCodeGrant(req.query.code)
     .then(function(data) {
       spotifyApi.setAccessToken(data.body['access_token']);
@@ -52,6 +55,7 @@ app.get('/callback', function(req, res) {
 });
 
 app.use('/store', function(req, res, next) {
+  console.log('store use')
   if (req.body.token !== process.env.SLACK_TOKEN) {
     return slack(res.status(500), 'Cross site request forgerizzle!');
   }
@@ -59,6 +63,7 @@ app.use('/store', function(req, res, next) {
 });
 
 app.post('/store', function(req, res) {
+  console.log('store post')
   spotifyApi.refreshAccessToken()
     .then(function(data) {
       spotifyApi.setAccessToken(data.body['access_token']);
